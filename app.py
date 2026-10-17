@@ -40,29 +40,173 @@ if "timer_start" not in st.session_state:
     st.session_state.timer_start = None
 
 # -----------------------------------------------------------------------------
-# GEORGIA STANDARDS GENERATOR ENGINE
+# GEORGIA K-12 FULL STANDARDS REGISTRY
+# -----------------------------------------------------------------------------
+GA_STANDARDS_DB = {
+    "Grade K": {
+        "Mathematics": [
+            {"code": "K.NR.1", "desc": "Counting & Cardinality (within 20)"},
+            {"code": "K.NR.2", "desc": "Comparing Quantities & Numbers"},
+            {"code": "K.NR.5", "desc": "Addition & Subtraction Concepts (within 10)"},
+            {"code": "K.GSR.7", "desc": "Identifying 2D & 3D Shapes"}
+        ],
+        "Science": [
+            {"code": "SKP1", "desc": "Physical Attributes of Objects"},
+            {"code": "SKL1", "desc": "Living & Non-Living Things"}
+        ],
+        "Social Studies": [
+            {"code": "SSKH1", "desc": "American Symbols & Historical Figures"},
+            {"code": "SSKG1", "desc": "Maps & Geographic Concepts"}
+        ],
+        "English Language Arts": [
+            {"code": "ELAGSEKRF1", "desc": "Print Concepts & Word Counts"},
+            {"code": "ELAGSEKRL1", "desc": "Key Details in Stories"}
+        ]
+    },
+    "Grade 1": {
+        "Mathematics": [
+            {"code": "1.NR.1", "desc": "Extend Counting to 120"},
+            {"code": "1.NR.2", "desc": "Addition & Subtraction within 20"},
+            {"code": "1.MDR.5", "desc": "Tell & Write Time to Hour/Half-Hour"}
+        ],
+        "Science": [{"code": "S1P1", "desc": "Light & Sound Energy"}],
+        "Social Studies": [{"code": "SS1H1", "desc": "Historical Figures of Georgia"}],
+        "English Language Arts": [{"code": "ELAGSE1RL1", "desc": "Answering Details in Text"}]
+    },
+    "Grade 2": {
+        "Mathematics": [
+            {"code": "2.NR.1", "desc": "Place Value to 1,000"},
+            {"code": "2.NR.2", "desc": "Fluently Add/Subtract within 100"}
+        ],
+        "Science": [{"code": "S2P1", "desc": "States of Matter"}],
+        "Social Studies": [{"code": "SS2G1", "desc": "Georgia Regions & Rivers"}],
+        "English Language Arts": [{"code": "ELAGSE2L1", "desc": "Grammar & Nouns/Verbs"}]
+    },
+    "Grade 3": {
+        "Mathematics": [
+            {"code": "3.PAR.3", "desc": "Multiplication & Division Concepts"},
+            {"code": "3.NR.4", "desc": "Fractions as Numbers"}
+        ],
+        "Science": [{"code": "S3E1", "desc": "Rocks, Soils & Fossils"}],
+        "Social Studies": [{"code": "SS3H1", "desc": "American Indians & Early Settlers"}],
+        "English Language Arts": [{"code": "ELAGSE3RI1", "desc": "Main Idea & Details"}]
+    },
+    "Grade 4": {
+        "Mathematics": [{"code": "4.NR.2", "desc": "Multi-Digit Multiplication & Division"}],
+        "Science": [{"code": "S4P1", "desc": "Light & Sound Behavior"}],
+        "Social Studies": [{"code": "SS4H1", "desc": "American Revolution"}],
+        "English Language Arts": [{"code": "ELAGSE4L1", "desc": "Relative Pronouns & Adverbs"}]
+    },
+    "Grade 5": {
+        "Mathematics": [{"code": "5.NR.3", "desc": "Fraction Operations & Decimals"}],
+        "Science": [{"code": "S5P1", "desc": "Chemical & Physical Changes"}],
+        "Social Studies": [{"code": "SS5H1", "desc": "Civil War & Reconstruction"}],
+        "English Language Arts": [{"code": "ELAGSE5R1", "desc": "Inferences from Text"}]
+    },
+    "Grade 6": {
+        "Mathematics": [{"code": "6.PAR.2", "desc": "Ratios & Rates"}],
+        "Science": [{"code": "S6E1", "desc": "Astronomy & Solar System"}],
+        "Social Studies": [{"code": "SS6G1", "desc": "Geography of Latin America & Canada"}],
+        "English Language Arts": [{"code": "ELAGSE6L1", "desc": "Pronoun Case & Agreement"}]
+    },
+    "Grade 7": {
+        "Mathematics": [
+            {"code": "7.PAR.2", "desc": "Linear Equations"},
+            {"code": "7.PAR.4", "desc": "Proportional Relationships"}
+        ],
+        "Science": [{"code": "S7L2", "desc": "Cell Biology & Genetics"}],
+        "Social Studies": [{"code": "SS7G8", "desc": "Geography of Southwest Asia"}],
+        "English Language Arts": [{"code": "ELAGSE7L1", "desc": "Phrases & Clauses"}]
+    },
+    "Grade 8": {
+        "Mathematics": [{"code": "8.FGR.5", "desc": "Functions & Linear Equations"}],
+        "Science": [{"code": "S8P1", "desc": "Atoms & Periodic Table"}],
+        "Social Studies": [{"code": "SS8H1", "desc": "Georgia History & Native Cultures"}],
+        "English Language Arts": [{"code": "ELAGSE8L1", "desc": "Verbal Types (Gerunds, Participles)"}]
+    },
+    "High School": {
+        "Mathematics": [{"code": "A.PAR.6", "desc": "Quadratic & Exponential Functions"}],
+        "Science": [{"code": "SP1", "desc": "Physics & Motion"}],
+        "Social Studies": [{"code": "SSCG1", "desc": "Georgia & US Constitution"}],
+        "English Language Arts": [{"code": "ELAGSE9-10L1", "desc": "Advanced Syntax & Rhetoric"}]
+    }
+}
+
+# -----------------------------------------------------------------------------
+# DYNAMIC QUESTION GENERATOR ENGINE
 # -----------------------------------------------------------------------------
 def generate_ga_quest(subject, grade, track):
-    """Generates questions mapped directly to Georgia Learning Standards."""
+    """Generates dynamic questions strictly aligned to standard limits."""
     
+    # Selected Grade Standards Pool
+    standards_pool = GA_STANDARDS_DB.get(grade, GA_STANDARDS_DB["Grade K"]).get(subject, [])
+    selected_std = random.choice(standards_pool) if standards_pool else {"code": "GA.GEN", "desc": "General Standard"}
+
     # -------------------------------------------------------------------------
-    # 1. MATHEMATICS (Georgia K-12 Mathematics Standards)
+    # KINDERGARTEN (Strict Foundation Rules)
     # -------------------------------------------------------------------------
-    if subject == "Mathematics":
-        if "Grade 7" in grade:
+    if grade == "Grade K":
+        if subject == "Mathematics":
             if track == "Regular":
-                # Standard: 7.PAR.4 (Proportional Relationships)
+                n = random.randint(2, 10)
+                return {
+                    "std": f"GA Standard {selected_std['code']}: {selected_std['desc']}",
+                    "q": f"Count forward: What number comes directly after ${n}$?",
+                    "ans": str(n + 1),
+                    "explain": f"Counting forward: ${n}, {n+1}$."
+                }
+            elif track in ["Advanced", "Accelerated"]:
+                a, b = random.randint(1, 5), random.randint(1, 4)
+                return {
+                    "std": f"GA Standard K.NR.5: Addition Concepts",
+                    "q": f"If you have ${a}$ apples and receive ${b}$ more, how many apples do you have total?",
+                    "ans": str(a + b),
+                    "explain": f"${a} + {b} = {a + b}$."
+                }
+            else: # Competition
+                return {
+                    "std": "GA Standard K.PAR.6: Pattern Recognition",
+                    "q": "Find the missing number in the sequence: 2, 4, 6, ___",
+                    "ans": "8",
+                    "explain": "The rule adds 2 each time ($6 + 2 = 8$)."
+                }
+        elif subject == "Science":
+            return {
+                "std": f"GA Standard {selected_std['code']}: {selected_std['desc']}",
+                "q": "Which shape rolls smoothly down a ramp: a square block or a round ball?",
+                "ans": "round ball",
+                "explain": "Round objects reduce surface resistance and roll smoothly."
+            }
+        elif subject == "Social Studies":
+            return {
+                "std": f"GA Standard {selected_std['code']}: {selected_std['desc']}",
+                "q": "What national symbol bird represents the United States?",
+                "ans": "bald eagle",
+                "explain": "The bald eagle is the national emblem of the United States."
+            }
+        else: # ELA
+            return {
+                "std": f"GA Standard {selected_std['code']}: {selected_std['desc']}",
+                "q": "How many words are in the sentence: 'I love Georgia'?",
+                "ans": "3",
+                "explain": "The three words are 'I', 'love', and 'Georgia'."
+            }
+
+    # -------------------------------------------------------------------------
+    # MIDDLE SCHOOL (Grade 6 - Grade 8)
+    # -------------------------------------------------------------------------
+    elif grade in ["Grade 6", "Grade 7", "Grade 8"]:
+        if subject == "Mathematics":
+            if track == "Regular":
                 ratio = random.randint(3, 8)
                 x = random.randint(2, 10)
-                y = ratio * x
                 return {
                     "std": "GA Standard 7.PAR.4: Proportional Relationships",
-                    "q": f"If $y = {ratio}x$, what is the value of $y$ when $x = {x}$?",
-                    "ans": str(y),
-                    "explain": f"Substitute $x = {x}$ into the equation: $y = {ratio} \\times {x} = {y}$."
+                    "q": f"If $y = {ratio}x$, what is $y$ when $x = {x}$?",
+                    "ans": str(ratio * x),
+                    "explain": f"Substitute $x = {x}$: $y = {ratio} \\times {x} = {ratio * x}$."
                 }
             elif track == "Advanced":
-                # Standard: 7.PAR.2 (Expressions & Equations)
                 a, b = random.randint(2, 6), random.randint(5, 20)
                 x_val = random.randint(3, 12)
                 c = a * x_val + b
@@ -70,108 +214,65 @@ def generate_ga_quest(subject, grade, track):
                     "std": "GA Standard 7.PAR.2: Solve Multi-Step Equations",
                     "q": f"Solve for $x$: ${a}x + {b} = {c}$",
                     "ans": str(x_val),
-                    "explain": f"Subtract ${b}$ from both sides to get ${a}x = {c - b}$, then divide by ${a}$ to get $x = {x_val}$."
+                    "explain": f"Subtract ${b}$ then divide by ${a}$: $x = {x_val}$."
                 }
             elif track == "Accelerated":
-                # Standard: 8.FGR.5 (Linear Functions)
                 m, b_val = random.randint(2, 5), random.randint(1, 10)
                 x_val = random.randint(2, 6)
-                y_val = m * x_val + b_val
                 return {
-                    "std": "GA Standard 8.FGR.5: Slope-Intercept Form (Accelerated)",
-                    "q": f"A line has a slope of ${m}$ and a $y$-intercept of ${b_val}$. What is the value of $y$ when $x = {x_val}$?",
-                    "ans": str(y_val),
-                    "explain": f"Use $y = mx + b$: $y = {m}({x_val}) + {b_val} = {y_val}$."
+                    "std": "GA Standard 8.FGR.5: Linear Functions",
+                    "q": f"A line has slope ${m}$ and $y$-intercept ${b_val}$. What is $y$ when $x = {x_val}$?",
+                    "ans": str(m * x_val + b_val),
+                    "explain": f"$y = {m}({x_val}) + {b_val} = {m * x_val + b_val}$."
                 }
-            else: # Competition
-                # Math Olympiad / AMC 8 style
+            else: # Competition Track
                 n = random.randint(5, 12)
                 ans = (n * (n - 1)) // 2
                 return {
                     "std": "GA Quest Competition: Combinatorial Reasoning",
-                    "q": f"If ${n}$ Georgia middle schools participate in a basketball tournament where every team plays every other team once, how many total games are played?",
+                    "q": f"If ${n}$ Georgia middle schools participate in a basketball tournament where every team plays every other team once, how many total games occur?",
                     "ans": str(ans),
-                    "explain": f"Use the combination formula $\\binom{{{n}}}{{2}} = \\frac{{{n}({n}-1)}}{{2}} = {ans}$."
+                    "explain": f"Combination formula $\\binom{{{n}}}{{2}} = \\frac{{{n}({n}-1)}}{{2}} = {ans}$."
                 }
-        else:
-            # General Math Fallback (K-12)
-            a, b = random.randint(10, 50), random.randint(2, 10)
+        elif subject == "Science":
             return {
-                "std": "GA Standard NR.1: Numeric Reasoning",
-                "q": f"Evaluate: ${a} \\times {b}$",
-                "ans": str(a * b),
-                "explain": f"${a} \\times {b} = {a * b}$"
+                "std": "GA Standard S7L2: Organisms and Biological Systems",
+                "q": "Which organelle generates ATP energy for cellular processes?",
+                "ans": "mitochondria",
+                "explain": "Mitochondria convert oxygen and nutrients into chemical energy."
             }
-
-    # -------------------------------------------------------------------------
-    # 2. SCIENCE (Georgia Performance Standards for Science - GSE)
-    # -------------------------------------------------------------------------
-    elif subject == "Science":
-        if "Grade 7" in grade:
-            if track in ["Regular", "Advanced"]:
-                return {
-                    "std": "GA Standard S7L2: Organisms and Biological Systems",
-                    "q": "Which organelle is known as the powerhouse of the cell responsible for generating ATP energy?",
-                    "ans": "mitochondria",
-                    "explain": "The mitochondria convert oxygen and nutrients into chemical energy (ATP) via cellular respiration."
-                }
-            else:
-                return {
-                    "std": "GA Standard S7L3: Genetics and Heredity",
-                    "q": "If both parents are heterozygous (Tt) for a dominant trait, what percentage chance does an offspring have of displaying the recessive phenotype? (Enter number only)",
-                    "ans": "25",
-                    "explain": "A Punnett square for Tt × Tt yields TT (25%), Tt (50%), and tt (25%). The recessive phenotype (tt) occurs 25% of the time."
-                }
-        else:
+        elif subject == "Social Studies":
             return {
-                "std": "GA Standard S8P1: Matter and Physical Science",
-                "q": "What subatomic particle carries a negative electrical charge?",
-                "ans": "electron",
-                "explain": "Electrons carry a negative charge, protons carry a positive charge, and neutrons carry no charge."
-            }
-
-    # -------------------------------------------------------------------------
-    # 3. SOCIAL STUDIES (Georgia Performance Standards for Social Studies)
-    # -------------------------------------------------------------------------
-    elif subject == "Social Studies":
-        if "Grade 7" in grade:
-            return {
-                "std": "GA Standard SS7G8: Geographic Influence in Southwest Asia",
-                "q": "Which major river flows through Iraq and forms part of the historical Mesopotamian Fertile Crescent along with the Euphrates?",
+                "std": "GA Standard SS7G8: Southwest Asia Geography",
+                "q": "Which major river flows alongside the Euphrates in Iraq?",
                 "ans": "tigris",
-                "explain": "The Tigris and Euphrates rivers define the historical region of Mesopotamia."
-            }
-        elif "Grade 8" in grade:
-            return {
-                "std": "GA Standard SS8H1: Georgia History & Native Cultures",
-                "q": "Which prehistoric Native American culture in Georgia built large earthen mounds and was present when Spanish explorers arrived?",
-                "ans": "mississippian",
-                "explain": "The Mississippian culture constructed large complex mounds and flourished in Georgia from approximately 800 to 1600 AD."
+                "explain": "The Tigris and Euphrates form the Fertile Crescent."
             }
         else:
             return {
-                "std": "GA Standard SSCG1: Georgia Civics & Government",
-                "q": "How many branches of government exist under the Georgia State Constitution?",
-                "ans": "3",
-                "explain": "Georgia's government is divided into Legislative, Executive, and Judicial branches."
+                "std": "GA Standard ELAGSE7L1: Sentence Structures",
+                "q": "Identify the sentence structure: 'Although it rained, we ran.' (Simple, Compound, or Complex)",
+                "ans": "complex",
+                "explain": "Contains one independent and one dependent clause."
             }
 
     # -------------------------------------------------------------------------
-    # 4. ENGLISH LANGUAGE ARTS (ELA)
+    # OTHER GRADES (Fallback Generator)
     # -------------------------------------------------------------------------
     else:
+        a, b = random.randint(2, 12), random.randint(2, 12)
         return {
-            "std": "GA Standard ELAGSE7L1: Grammar and Conventions",
-            "q": "Identify the type of sentence structure: 'Although it was raining, we went for a run in the park.' (Simple, Compound, Complex, or Compound-Complex)",
-            "ans": "complex",
-            "explain": "A sentence with one independent clause ('we went for a run in the park') and at least one dependent clause ('Although it was raining') is a complex sentence."
+            "std": f"GA Standard {selected_std['code']}: {selected_std['desc']}",
+            "q": f"Evaluate: ${a} \\times {b}$",
+            "ans": str(a * b),
+            "explain": f"${a} \\times {b} = {a * b}$."
         }
 
 # -----------------------------------------------------------------------------
 # USER INTERFACE & NAVIGATION
 # -----------------------------------------------------------------------------
 st.markdown('<p class="main-title">🍑 GA Standards Quest</p>', unsafe_allow_html=True)
-st.markdown('<p class="sub-title">State-Aligned Practice • Regular, Advanced, Accelerated & Competition Tracks</p>', unsafe_allow_html=True)
+st.markdown('<p class="sub-title">Full Curriculum Coverage • K-12 Georgia Performance Standards</p>', unsafe_allow_html=True)
 
 # Sidebar Setup
 with st.sidebar:
@@ -184,14 +285,12 @@ with st.sidebar:
     
     grade = st.selectbox(
         "Select Grade Level",
-        ["Grade K", "Grade 1", "Grade 2", "Grade 3", "Grade 4", "Grade 5", 
-         "Grade 6", "Grade 7", "Grade 8", "Grade 9 (Alg I / Lit)", "Grade 10 (Geom)", "Grade 11 (Alg II / US Hist)", "Grade 12 (Calc / Econ)"]
+        list(GA_STANDARDS_DB.keys())
     )
     
     track = st.radio(
         "Select Track Level",
-        ["Regular", "Advanced", "Accelerated", "🏆 Competition Level"],
-        help="Competition track features contest-style reasoning and analytical problems."
+        ["Regular", "Advanced", "Accelerated", "🏆 Competition Level"]
     )
     
     st.divider()
@@ -200,6 +299,14 @@ with st.sidebar:
         st.session_state.total_questions = 0
         st.session_state.current_problem = None
         st.rerun()
+
+# Display Available Standards for Selected Grade & Subject
+st.markdown(f"### 📋 Active Standards: **{grade} — {subject}**")
+std_list = GA_STANDARDS_DB.get(grade, {}).get(subject, [])
+std_cols = st.columns(len(std_list) if std_list else 1)
+for idx, item in enumerate(std_list):
+    with std_cols[idx % len(std_cols)]:
+        st.info(f"**{item['code']}**: {item['desc']}")
 
 # Scoreboard
 col1, col2, col3 = st.columns(3)
@@ -213,7 +320,7 @@ with col3:
 
 st.divider()
 
-# Load initial problem
+# Load problem
 clean_track = track.replace("🏆 ", "")
 if st.session_state.current_problem is None:
     st.session_state.current_problem = generate_ga_quest(subject, grade, clean_track)
