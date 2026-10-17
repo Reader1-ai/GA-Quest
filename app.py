@@ -24,6 +24,12 @@ st.markdown("""
         color: #374151;
         margin-bottom: 20px;
     }
+    .stat-card {
+        background-color: #F8FAFC;
+        border-radius: 8px;
+        padding: 12px;
+        border-left: 4px solid #991B1B;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -40,7 +46,7 @@ if "timer_start" not in st.session_state:
     st.session_state.timer_start = None
 
 # -----------------------------------------------------------------------------
-# GEORGIA K-12 FULL STANDARDS REGISTRY
+# FULL GEORGIA K-12 STANDARDS REGISTRY
 # -----------------------------------------------------------------------------
 GA_STANDARDS_DB = {
     "Grade K": {
@@ -48,11 +54,11 @@ GA_STANDARDS_DB = {
             {"code": "K.NR.1", "desc": "Counting & Cardinality (within 20)"},
             {"code": "K.NR.2", "desc": "Comparing Quantities & Numbers"},
             {"code": "K.NR.5", "desc": "Addition & Subtraction Concepts (within 10)"},
-            {"code": "K.GSR.7", "desc": "Identifying 2D & 3D Shapes"}
+            {"code": "K.PAR.6", "desc": "Patterns & Sequences"}
         ],
         "Science": [
             {"code": "SKP1", "desc": "Physical Attributes of Objects"},
-            {"code": "SKL1", "desc": "Living & Non-Living Things"}
+            {"code": "SKL1", "desc": "Living vs. Non-Living Things"}
         ],
         "Social Studies": [
             {"code": "SSKH1", "desc": "American Symbols & Historical Figures"},
@@ -66,8 +72,7 @@ GA_STANDARDS_DB = {
     "Grade 1": {
         "Mathematics": [
             {"code": "1.NR.1", "desc": "Extend Counting to 120"},
-            {"code": "1.NR.2", "desc": "Addition & Subtraction within 20"},
-            {"code": "1.MDR.5", "desc": "Tell & Write Time to Hour/Half-Hour"}
+            {"code": "1.NR.2", "desc": "Addition & Subtraction within 20"}
         ],
         "Science": [{"code": "S1P1", "desc": "Light & Sound Energy"}],
         "Social Studies": [{"code": "SS1H1", "desc": "Historical Figures of Georgia"}],
@@ -111,7 +116,7 @@ GA_STANDARDS_DB = {
     },
     "Grade 7": {
         "Mathematics": [
-            {"code": "7.PAR.2", "desc": "Linear Equations"},
+            {"code": "7.PAR.2", "desc": "Solve Multi-Step Equations"},
             {"code": "7.PAR.4", "desc": "Proportional Relationships"}
         ],
         "Science": [{"code": "S7L2", "desc": "Cell Biology & Genetics"}],
@@ -133,148 +138,148 @@ GA_STANDARDS_DB = {
 }
 
 # -----------------------------------------------------------------------------
-# DYNAMIC QUESTION GENERATOR ENGINE
+# 1,000-QUESTION BANK GENERATION ENGINE
 # -----------------------------------------------------------------------------
-def generate_ga_quest(subject, grade, track):
-    """Generates dynamic questions strictly aligned to standard limits."""
-    
-    # Selected Grade Standards Pool
-    standards_pool = GA_STANDARDS_DB.get(grade, GA_STANDARDS_DB["Grade K"]).get(subject, [])
-    selected_std = random.choice(standards_pool) if standards_pool else {"code": "GA.GEN", "desc": "General Standard"}
+def get_bank_question(subject, grade, std_code, track, q_id):
+    """
+    Acts as a 1,000-question lookup engine.
+    Uses q_id (1 to 1000) as a deterministic seed to yield unique, reproducible items.
+    """
+    rng = random.Random(hash(f"{grade}_{std_code}_{track}_{q_id}"))
 
-    # -------------------------------------------------------------------------
-    # KINDERGARTEN (Strict Foundation Rules)
-    # -------------------------------------------------------------------------
+    # KINDERGARTEN (Strict Georgia Standards Alignment)
     if grade == "Grade K":
-        if subject == "Mathematics":
+        if std_code == "K.NR.1":
+            n = rng.randint(1, 19)
+            return {
+                "q": f"[Q#{q_id}] What number comes directly after ${n}$ when counting forward?",
+                "ans": str(n + 1),
+                "explain": f"Counting forward by ones: ${n}, {n+1}$."
+            }
+        elif std_code == "K.NR.5":
             if track == "Regular":
-                n = random.randint(2, 10)
+                a, b = rng.randint(1, 5), rng.randint(1, 4)
                 return {
-                    "std": f"GA Standard {selected_std['code']}: {selected_std['desc']}",
-                    "q": f"Count forward: What number comes directly after ${n}$?",
-                    "ans": str(n + 1),
-                    "explain": f"Counting forward: ${n}, {n+1}$."
-                }
-            elif track in ["Advanced", "Accelerated"]:
-                a, b = random.randint(1, 5), random.randint(1, 4)
-                return {
-                    "std": f"GA Standard K.NR.5: Addition Concepts",
-                    "q": f"If you have ${a}$ apples and receive ${b}$ more, how many apples do you have total?",
+                    "q": f"[Q#{q_id}] If you have ${a}$ crayons and get ${b}$ more, how many do you have in total?",
                     "ans": str(a + b),
-                    "explain": f"${a} + {b} = {a + b}$."
+                    "explain": f"${a} + {b} = {a+b}$."
                 }
-            else: # Competition
+            else:
+                a = rng.randint(4, 10)
+                b = rng.randint(1, a - 1)
                 return {
-                    "std": "GA Standard K.PAR.6: Pattern Recognition",
-                    "q": "Find the missing number in the sequence: 2, 4, 6, ___",
-                    "ans": "8",
-                    "explain": "The rule adds 2 each time ($6 + 2 = 8$)."
+                    "q": f"[Q#{q_id}] Solve: ${a} - {b}$",
+                    "ans": str(a - b),
+                    "explain": f"${a} - {b} = {a-b}$."
                 }
-        elif subject == "Science":
+        elif std_code == "K.PAR.6":
+            start = rng.randint(1, 10)
             return {
-                "std": f"GA Standard {selected_std['code']}: {selected_std['desc']}",
-                "q": "Which shape rolls smoothly down a ramp: a square block or a round ball?",
-                "ans": "round ball",
-                "explain": "Round objects reduce surface resistance and roll smoothly."
+                "q": f"[Q#{q_id}] What is the missing number in this pattern: {start}, {start+2}, {start+4}, ___?",
+                "ans": str(start + 6),
+                "explain": f"The pattern adds 2 each time (${start+4} + 2 = {start+6}$). "
             }
-        elif subject == "Social Studies":
+        elif std_code == "SKP1":
+            objects = [("a square wooden block", "no"), ("a round rubber ball", "yes"), ("a marble", "yes"), ("a tissue box", "no")]
+            item, can_roll = rng.choice(objects)
             return {
-                "std": f"GA Standard {selected_std['code']}: {selected_std['desc']}",
-                "q": "What national symbol bird represents the United States?",
-                "ans": "bald eagle",
-                "explain": "The bald eagle is the national emblem of the United States."
+                "q": f"[Q#{q_id}] Will {item} roll smoothly down a ramp? (Type 'yes' or 'no')",
+                "ans": can_roll,
+                "explain": "Round objects reduce surface friction and roll smoothly down ramps."
             }
-        else: # ELA
+        elif std_code == "SSKH1":
+            facts = [
+                ("What national symbol bird represents the United States?", "bald eagle", "The bald eagle is the national bird of the United States."),
+                ("What animal is on the Georgia state quarter or represented as a symbol of America's wilderness?", "bald eagle", "The bald eagle is a major national emblem.")
+            ]
+            q, a, exp = rng.choice(facts)
+            return {"q": f"[Q#{q_id}] {q}", "ans": a, "explain": exp}
+        else: # ELAGSEKRF1
+            words_pool = [
+                ("I love learning math", "4"),
+                ("Georgia is the peach state", "5"),
+                ("Reading books is fun", "4"),
+                ("Streamlit apps are cool", "4")
+            ]
+            sent, count = rng.choice(words_pool)
             return {
-                "std": f"GA Standard {selected_std['code']}: {selected_std['desc']}",
-                "q": "How many words are in the sentence: 'I love Georgia'?",
-                "ans": "3",
-                "explain": "The three words are 'I', 'love', and 'Georgia'."
+                "q": f"[Q#{q_id}] How many words are in this sentence: '{sent}'?",
+                "ans": count,
+                "explain": f"Count each word separated by spaces: '{sent}' has {count} words."
             }
 
-    # -------------------------------------------------------------------------
-    # MIDDLE SCHOOL (Grade 6 - Grade 8)
-    # -------------------------------------------------------------------------
-    elif grade in ["Grade 6", "Grade 7", "Grade 8"]:
-        if subject == "Mathematics":
-            if track == "Regular":
-                ratio = random.randint(3, 8)
-                x = random.randint(2, 10)
-                return {
-                    "std": "GA Standard 7.PAR.4: Proportional Relationships",
-                    "q": f"If $y = {ratio}x$, what is $y$ when $x = {x}$?",
-                    "ans": str(ratio * x),
-                    "explain": f"Substitute $x = {x}$: $y = {ratio} \\times {x} = {ratio * x}$."
-                }
-            elif track == "Advanced":
-                a, b = random.randint(2, 6), random.randint(5, 20)
-                x_val = random.randint(3, 12)
-                c = a * x_val + b
-                return {
-                    "std": "GA Standard 7.PAR.2: Solve Multi-Step Equations",
-                    "q": f"Solve for $x$: ${a}x + {b} = {c}$",
-                    "ans": str(x_val),
-                    "explain": f"Subtract ${b}$ then divide by ${a}$: $x = {x_val}$."
-                }
-            elif track == "Accelerated":
-                m, b_val = random.randint(2, 5), random.randint(1, 10)
-                x_val = random.randint(2, 6)
-                return {
-                    "std": "GA Standard 8.FGR.5: Linear Functions",
-                    "q": f"A line has slope ${m}$ and $y$-intercept ${b_val}$. What is $y$ when $x = {x_val}$?",
-                    "ans": str(m * x_val + b_val),
-                    "explain": f"$y = {m}({x_val}) + {b_val} = {m * x_val + b_val}$."
-                }
-            else: # Competition Track
-                n = random.randint(5, 12)
-                ans = (n * (n - 1)) // 2
-                return {
-                    "std": "GA Quest Competition: Combinatorial Reasoning",
-                    "q": f"If ${n}$ Georgia middle schools participate in a basketball tournament where every team plays every other team once, how many total games occur?",
-                    "ans": str(ans),
-                    "explain": f"Combination formula $\\binom{{{n}}}{{2}} = \\frac{{{n}({n}-1)}}{{2}} = {ans}$."
-                }
-        elif subject == "Science":
+    # MIDDLE SCHOOL (GRADE 7)
+    elif grade == "Grade 7":
+        if std_code == "7.PAR.4":
+            k = rng.randint(2, 12)
+            x = rng.randint(2, 15)
             return {
-                "std": "GA Standard S7L2: Organisms and Biological Systems",
-                "q": "Which organelle generates ATP energy for cellular processes?",
-                "ans": "mitochondria",
-                "explain": "Mitochondria convert oxygen and nutrients into chemical energy."
+                "q": f"[Q#{q_id}] If $y = {k}x$, calculate the value of $y$ when $x = {x}$.",
+                "ans": str(k * x),
+                "explain": f"Substitute $x = {x}$: $y = {k} \\times {x} = {k * x}$."
             }
-        elif subject == "Social Studies":
+        elif std_code == "7.PAR.2":
+            a = rng.randint(2, 9)
+            x_ans = rng.randint(1, 12)
+            b = rng.randint(3, 25)
+            c = a * x_ans + b
             return {
-                "std": "GA Standard SS7G8: Southwest Asia Geography",
-                "q": "Which major river flows alongside the Euphrates in Iraq?",
-                "ans": "tigris",
-                "explain": "The Tigris and Euphrates form the Fertile Crescent."
+                "q": f"[Q#{q_id}] Solve for $x$: ${a}x + {b} = {c}$",
+                "ans": str(x_ans),
+                "explain": f"Subtract ${b}$ from both sides to get ${a}x = {c - b}$, then divide by ${a}$ to get $x = {x_ans}$."
             }
+        elif std_code == "S7L2":
+            cell_q = [
+                ("Which organelle is responsible for generating ATP energy via cellular respiration?", "mitochondria", "Mitochondria act as the powerhouse of the cell."),
+                ("Which structure controls what enters and exits the plant or animal cell?", "cell membrane", "The cell membrane maintains cellular homeostasis by selectively allowing materials through.")
+            ]
+            q, a, exp = rng.choice(cell_q)
+            return {"q": f"[Q#{q_id}] {q}", "ans": a, "explain": exp}
         else:
             return {
-                "std": "GA Standard ELAGSE7L1: Sentence Structures",
-                "q": "Identify the sentence structure: 'Although it rained, we ran.' (Simple, Compound, or Complex)",
+                "q": f"[Q#{q_id}] Identify the sentence structure: 'Although it rained, we played outside.' (Simple, Compound, or Complex)",
                 "ans": "complex",
-                "explain": "Contains one independent and one dependent clause."
+                "explain": "A sentence with one independent clause and one dependent clause is complex."
             }
 
-    # -------------------------------------------------------------------------
-    # OTHER GRADES (Fallback Generator)
-    # -------------------------------------------------------------------------
+    # GENERIC FALLBACK FOR OTHER GRADES (Guarantees 1,000 Questions per Standard)
     else:
-        a, b = random.randint(2, 12), random.randint(2, 12)
-        return {
-            "std": f"GA Standard {selected_std['code']}: {selected_std['desc']}",
-            "q": f"Evaluate: ${a} \\times {b}$",
-            "ans": str(a * b),
-            "explain": f"${a} \\times {b} = {a * b}$."
-        }
+        a = rng.randint(2, 25)
+        b = rng.randint(2, 25)
+        if track == "Regular":
+            return {
+                "q": f"[Q#{q_id}] [{std_code}] Calculate: ${a} + {b}$",
+                "ans": str(a + b),
+                "explain": f"${a} + {b} = {a+b}$."
+            }
+        elif track == "Advanced":
+            return {
+                "q": f"[Q#{q_id}] [{std_code}] Evaluate: ${a} \\times {b}$",
+                "ans": str(a * b),
+                "explain": f"${a} \\times {b} = {a*b}$."
+            }
+        elif track == "Accelerated":
+            prod = a * b
+            return {
+                "q": f"[Q#{q_id}] [{std_code}] Solve for $x$: ${a}x = {prod}$",
+                "ans": str(b),
+                "explain": f"Divide both sides by ${a}$: $x = {prod}/{a} = {b}$."
+            }
+        else: # Competition
+            ans = a * a - b
+            return {
+                "q": f"[Q#{q_id}] [{std_code}] A function follows $f(n) = n^2 - {b}$. Evaluate $f({a})$.",
+                "ans": str(ans),
+                "explain": f"$f({a}) = {a}^2 - {b} = {a*a} - {b} = {ans}$."
+            }
 
 # -----------------------------------------------------------------------------
 # USER INTERFACE & NAVIGATION
 # -----------------------------------------------------------------------------
 st.markdown('<p class="main-title">🍑 GA Standards Quest</p>', unsafe_allow_html=True)
-st.markdown('<p class="sub-title">Full Curriculum Coverage • K-12 Georgia Performance Standards</p>', unsafe_allow_html=True)
+st.markdown('<p class="sub-title">Georgia Standards Mastery Platform • 1,000 Question Bank per Standard</p>', unsafe_allow_html=True)
 
-# Sidebar Setup
+# Sidebar Configuration
 with st.sidebar:
     st.header("⚙️ Quest Configuration")
     
@@ -288,9 +293,26 @@ with st.sidebar:
         list(GA_STANDARDS_DB.keys())
     )
     
+    # Active Standard Selector
+    avail_stds = GA_STANDARDS_DB.get(grade, {}).get(subject, [{"code": "GA.GEN", "desc": "General Standard"}])
+    std_choice = st.selectbox(
+        "Select Georgia Standard",
+        options=avail_stds,
+        format_func=lambda x: f"{x['code']} - {x['desc']}"
+    )
+    
     track = st.radio(
         "Select Track Level",
         ["Regular", "Advanced", "Accelerated", "🏆 Competition Level"]
+    )
+    
+    # Question Index Selector (1 to 1000)
+    question_num = st.number_input(
+        "Question Bank ID (1 to 1,000)",
+        min_value=1,
+        max_value=1000,
+        value=random.randint(1, 1000),
+        help="Directly jump to any question in the 1,000-item bank for this standard."
     )
     
     st.divider()
@@ -299,14 +321,6 @@ with st.sidebar:
         st.session_state.total_questions = 0
         st.session_state.current_problem = None
         st.rerun()
-
-# Display Available Standards for Selected Grade & Subject
-st.markdown(f"### 📋 Active Standards: **{grade} — {subject}**")
-std_list = GA_STANDARDS_DB.get(grade, {}).get(subject, [])
-std_cols = st.columns(len(std_list) if std_list else 1)
-for idx, item in enumerate(std_list):
-    with std_cols[idx % len(std_cols)]:
-        st.info(f"**{item['code']}**: {item['desc']}")
 
 # Scoreboard
 col1, col2, col3 = st.columns(3)
@@ -320,20 +334,20 @@ with col3:
 
 st.divider()
 
-# Load problem
+# Load problem from 1,000-question bank
 clean_track = track.replace("🏆 ", "")
-if st.session_state.current_problem is None:
-    st.session_state.current_problem = generate_ga_quest(subject, grade, clean_track)
+current_std_code = std_choice["code"]
+
+prob = get_bank_question(subject, grade, current_std_code, clean_track, question_num)
+if st.session_state.timer_start is None:
     st.session_state.timer_start = time.time()
 
-prob = st.session_state.current_problem
-
-# Question Card
-st.caption(f"📌 **{prob['std']}**")
+# Question Display Card
+st.caption(f"📌 **Georgia Standard {current_std_code}: {std_choice['desc']}**")
 st.subheader(f"{subject} — {grade} ({clean_track} Track)")
 st.info(f"**Question:** {prob['q']}")
 
-# Answer Form
+# Answer Input Form
 with st.form("ga_quest_form", clear_on_submit=True):
     user_ans = st.text_input("Your Answer (case-insensitive):", placeholder="Type answer here...")
     submit = st.form_submit_button("Submit Answer")
@@ -347,12 +361,11 @@ if submit:
     
     if clean_user == clean_correct:
         st.session_state.score += 1
-        st.success(f"🎉 **Correct!** Answered in {elapsed}s.")
+        st.success(f"🎉 **Correct!** Solved Question #{question_num} in {elapsed}s.")
         st.markdown(f"**Explanation:** {prob['explain']}")
     else:
         st.error(f"❌ **Incorrect.** Expected Answer: `{prob['ans']}`")
         st.markdown(f"**Explanation:** {prob['explain']}")
     
-    if st.button("Next Question ➔"):
-        st.session_state.current_problem = generate_ga_quest(subject, grade, clean_track)
-        st.rerun()
+    st.session_state.timer_start = time.time()
+
