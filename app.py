@@ -159,4 +159,4 @@ def get_bank_question(subject, grade, std_code, track, q_id):
                 return {
                     "q": fr"[Q#{q_id}] Find the largest real root of $x^2 + ({b_val})x + ({c_val}) = 0$.",
                     "ans": str(max(r1, r2)),
-                    "explain": fr"Factoring gives $(x - {r1})(x - {r2}) = 0$. The roots are ${r1}$ and ${r2}$."
+                    "explain": fr"Factoring gives $(x - {r1})(x - {r2}) = 0$. The roots are ${r1}$ and ${r2}$."}
